@@ -5,7 +5,7 @@ class BarStatus:
     rects = []                      # The bars in the bar graph
     labels = []                     # Currently used to display votes
     options = []
-    labelsText = ["Other", "Objective", "Subjective"] # labels for each bar graph
+
 
     offset = 200                                # offset between each of the bars
     width = 50                      # of each bar
@@ -16,7 +16,8 @@ class BarStatus:
     rectFill = "#A51C30"
     rectFillAlt = "#C3384B"
 
-    def __init__(self, canvas, loc, num):
+    def __init__(self, canvas, loc, num, labelsText=[]):
+        self.labelsText = labelsText
         self.number = num
         self.canvas = canvas
         self.location = loc

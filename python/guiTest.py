@@ -10,16 +10,17 @@ from dividedBarGraph import *
 serialPorts = ["/dev/ttyUSB0", "/dev/ttyUSB1","/dev/ttyUSB2", "FAKE"]
 baudRate = 115200
 
-
+# This for loop attempts many different serial ports
 for port in serialPorts:
     try:
         if port != "FAKE":
             ser = Serial(port , baudRate, timeout=0, writeTimeout=0) #ensure non-blocking
             print("Connecting to:", port, "... SUCCESS!")
         else:
+            # If there are no serial ports, use fake serial to read from file
             print("Using Fake Serial")
             ser = FakeSerial( "test.txt")            
-        break
+        break                   # once port is found, break from loop
     except:
         print("Cannot connect to:", port)
 
@@ -27,11 +28,7 @@ for port in serialPorts:
 
 DEBUG = False
 BUTTON_NUM = 3
-#make a TkInter Window
-root = Tk()
-root.wm_title("Veritas Voting")
-root.attributes("-fullscreen", True)
-
+labelsText = ["Other", "Objective", "Subjective"] # labels for each bar graph
 
 def toggleFullscreen(event):
     root.attributes("-fullscreen", root.attributes("-fullscreen") == 0)
@@ -39,19 +36,28 @@ def toggleFullscreen(event):
 def toggleDebug(event):
     global DEBUG
     DEBUG = not DEBUG
-    if DEBUG == True:
+    if DEBUG:
         log.pack()
     else:
         log.pack_forget()
 
-
+#make a TkInter Window
+root = Tk()
+root.wm_title("Veritas Voting")
+root.attributes("-fullscreen", True)
 root.bind("<Control-w>", lambda e: root.destroy())
 root.bind("<Escape>", toggleFullscreen)
 root.bind("h", toggleDebug)
 canvas = Canvas(root, width=1000, height=800, bg="#F3F3F1")
 canvas.pack(fill=BOTH, expand=YES)
-img = PhotoImage(file='logo.png')
-canvas.create_image(1000, 150, image=img)
+logo = PhotoImage(file='logo.png')
+canvas.create_image(1000, 150, image=logo)
+
+# make a text box to put the serial output
+log = Text ( root, width=50, height=10, takefocus=0)
+log.pack()
+if not DEBUG:
+    log.pack_forget()
 
 
 votes = [1 for i in range(BUTTON_NUM)]            # an array to store votes for each
@@ -66,35 +72,27 @@ top =400                        # Where to start the bars
 
 
 
-# make a text box to put the serial output
-log = Text ( root, width=50, height=10, takefocus=0)
-log.pack()
-if not DEBUG:
-    log.pack_forget()
 
 
-question = canvas.create_text( left/2, top +width/2 + offset, width = left, justify=CENTER,
-                           font=("Purisa-Bold", 70), anchor =CENTER, fill="#1E1E1E",
-                           text = "Is Morality Objective or Subjective?")
+question = canvas.create_text(
+    left/2, top +width/2 + offset, width = left, justify=CENTER,
+    font=("Purisa-Bold", 70), anchor =CENTER, fill="#1E1E1E",
+    text = "Is Morality Objective or Subjective?")
 
 
 
-barStatus = BarStatus(canvas, (left,top), BUTTON_NUM)
-# RESULTS::
-divGraph = DividedBarGraph( canvas, (200, 1000), 3)
+barStatus = BarStatus(canvas, (left,top), BUTTON_NUM, labelsText)
+divGraph = DividedBarGraph( canvas, (200, 900), 3, labelsText)
 
 
 def updateAll(string):
-    minimum = left + 30
-    maximum = left + length
-    threshold = 20             # center point of when bar should move
-    deadZone = 10               # prevent jitter (like a schmitt trigger)
-    step = 20
-
-    statStep = 0.04
+    threshold = 20           # center point of when bar should move
+    deadZone = 10            # prevent jitter (like a schmitt trigger)
+    statStep = 25/100        # How much the status changes each step
 
     
     lst = string.split()
+    # TODO: make it also check all are numbers
     if(len(lst) < BUTTON_NUM):          # stop processing if list incomplete
         return
 
@@ -112,7 +110,7 @@ def updateAll(string):
         elif status[i] == 0:
             canVote[i] = True
             # A button was just reset
-    divGraph.update(votes)
+    divGraph.update(votes, status, canVote)
     barStatus.update( votes, status, canVote)
 
 
