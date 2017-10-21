@@ -1,6 +1,7 @@
 from serial import *
 from tkinter import *
 from fakeSerial import *
+from barStatus import *
 # The start of this code came from here Evan Boldt:
 # http://robotic-controls.com/learn/python-guis/tkinter-serial
 
@@ -52,31 +53,18 @@ img = PhotoImage(file='logo.png')
 canvas.create_image(1000, 150, image=img)
 
 
-rects = []                      # The bars in the bar graph
-labels = []                     # Currently used to display votes
-labelsText = ["Other", "Objective", "Subjective"] # labels for each bar graph
+
 votes = [0 for i in range(BUTTON_NUM)]            # an array to store votes for each
 canVote = [True for i in range(BUTTON_NUM)] # keeps track if slider has reset yet
+status = [0.0 for i in range(BUTTON_NUM)] # what stage is the button in (ie starting to vote, cooling down, at max/min)
+
 offset = 200                                # offset between each of the bars
 width = 50                      # of each bar
-length = 450                    # max length of each bar
 left = 1200                     # where to start the bars (from the left)
+length = 450                    # max length of each bar
 top =400                        # Where to start the bars
 
-barColorNormal = "#C3384B"
-barColorHighlight = "#A51C30"
 
-for i in range(BUTTON_NUM):
-    rect = canvas.create_rectangle(left, top + offset*i,
-                                   left+length, top + width + offset*i, fill="#293352")
-    text = canvas.create_text( left+length + width/2, top +width/2 + offset*i,
-                               font=("Purisa-Bold", 35), anchor =W, fill="#1E1E1E",
-                               text = "TEST OF TEXT")
-    options = canvas.create_text( left + width, top +width/2 + offset*i,
-                                  font=("Purisa-Bold", 35), anchor =W, fill="#1E1E1E",
-                                  text = labelsText[i])
-    rects.append(rect)
-    labels.append(text)
 
 # make a text box to put the serial output
 log = Text ( root, width=50, height=10, takefocus=0)
@@ -90,6 +78,8 @@ question = canvas.create_text( left/2, top +width/2 + offset, width = left, just
                            text = "Is Morality Objective or Subjective?")
 
 
+barStatus = BarStatus(canvas, (left,top), BUTTON_NUM)
+
 
 
 def updateAll(string):
@@ -99,37 +89,29 @@ def updateAll(string):
     deadZone = 10               # prevent jitter (like a schmitt trigger)
     step = 20
 
+    statStep = 0.04
+
+    
     lst = string.split()
     if(len(lst) < BUTTON_NUM):          # stop processing if list incomplete
         return
 
-    for i in range(len(rects)):
-        x0, y0, x1, y1 = canvas.coords(rects[i])
-
+    for i in range(BUTTON_NUM):
         if int(lst[i]) > threshold + deadZone:
-            newEnd = x1 + step
+            status[i] += statStep
         elif int(lst[i]) < threshold - deadZone:
-            newEnd = x1 - step
-        else:
-            newEnd = x1
-            
-        newEnd = max( min(maximum, newEnd), minimum)
+            status[i] += - statStep
+        status[i] = max( min(1, status[i]), 0)
 
-        # check for votes  TODO: make more robust
-        if newEnd == maximum and canVote[i]:
+        if status[i] == 1 and canVote[i]:
             votes[i]+=1
-            canvas.itemconfig(rects[i], fill = barColorNormal)
             canVote[i] = False
-        elif newEnd == minimum:
+            # A vote was just cast
+        elif status[i] == 0:
             canVote[i] = True
-            canvas.itemconfig(rects[i], fill = barColorHighlight)
-            
-        canvas.coords(rects[i], x0,y0, newEnd, y1)
-        #canvas.itemconfig(rects[i], fill = "#A51C30")
-        canvas.itemconfig(labels[i], text = str(votes[i]))
+            # A button was just reset
 
-
-        
+    barStatus.update( votes, status, canVote)
 
 
     
