@@ -1,6 +1,7 @@
 from serial import *
 from tkinter import *
 from fakeSerial import *
+from dividedBarGraph import *
 # The start of this code came from here Evan Boldt:
 # http://robotic-controls.com/learn/python-guis/tkinter-serial
 
@@ -55,7 +56,7 @@ canvas.create_image(1000, 150, image=img)
 rects = []                      # The bars in the bar graph
 labels = []                     # Currently used to display votes
 labelsText = ["Other", "Objective", "Subjective"] # labels for each bar graph
-votes = [0 for i in range(BUTTON_NUM)]            # an array to store votes for each
+votes = [1 for i in range(BUTTON_NUM)]            # an array to store votes for each
 canVote = [True for i in range(BUTTON_NUM)] # keeps track if slider has reset yet
 offset = 200                                # offset between each of the bars
 width = 50                      # of each bar
@@ -90,6 +91,11 @@ question = canvas.create_text( left/2, top +width/2 + offset, width = left, just
                            text = "Is Morality Objective or Subjective?")
 
 
+# RESULTS::
+divGraph = DividedBarGraph( canvas, (200, 1000), 3)
+
+
+
 
 
 def updateAll(string):
@@ -116,7 +122,7 @@ def updateAll(string):
         newEnd = max( min(maximum, newEnd), minimum)
 
         # check for votes  TODO: make more robust
-        if newEnd == maximum and canVote[i]:
+        if newEnd == maximum and (canVote[i] or i == 1):
             votes[i]+=1
             canvas.itemconfig(rects[i], fill = barColorNormal)
             canVote[i] = False
@@ -127,6 +133,7 @@ def updateAll(string):
         canvas.coords(rects[i], x0,y0, newEnd, y1)
         #canvas.itemconfig(rects[i], fill = "#A51C30")
         canvas.itemconfig(labels[i], text = str(votes[i]))
+    divGraph.update(votes)
 
 
         
