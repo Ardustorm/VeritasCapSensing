@@ -8,7 +8,7 @@ class FakeSerial:
 
     def read(self):
         self.delay += 1
-        if (self.delay % 2 == 0):
+        if (self.delay % 5 != 0):
             return bytes(self.filename.read(1), "utf-8")
         else:
             return bytes("", "utf-8")

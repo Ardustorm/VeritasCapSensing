@@ -27,8 +27,8 @@ for port in serialPorts:
 
 
 DEBUG = False
-BUTTON_NUM = 3
-labelsText = ["Other", "Objective", "Subjective"] # labels for each bar graph
+BUTTON_NUM = 2
+labelsText = ["Subjective", "Other", "Objective", "3", "4", "5"] # labels for each bar graph
 
 def toggleFullscreen(event):
     root.attributes("-fullscreen", root.attributes("-fullscreen") == 0)
@@ -82,11 +82,11 @@ question = canvas.create_text(
 
 
 barStatus = BarStatus(canvas, (left,top), BUTTON_NUM, labelsText)
-divGraph = DividedBarGraph( canvas, (200, 900), 3, labelsText)
+divGraph = DividedBarGraph( canvas, (200, 900), BUTTON_NUM, labelsText)
 
 
 def updateAll(string):
-    threshold = 20           # center point of when bar should move
+    threshold = 40           # center point of when bar should move
     deadZone = 10            # prevent jitter (like a schmitt trigger)
     statStep = 25/100        # How much the status changes each step
 

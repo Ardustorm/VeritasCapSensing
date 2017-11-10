@@ -19,12 +19,9 @@ void setup() {
 
 void loop() {
    
-    long start = millis();
+   //long start = millis();
     long total1 =  cs_2_4.capacitiveSensor(30);
     long total2 =  cs_2_6.capacitiveSensor(30);
-
-    Serial.print(millis() - start);        // check on performance in milliseconds
-    Serial.print("\t");                    // tab character for debug windown spacing
 
     Serial.print(total1);                  // print sensor output 1
 
@@ -32,13 +29,6 @@ void loop() {
 
     Serial.print(total2);                  // print sensor output 2
 
-    Serial.print("\t");
-
-    for(int i = 50; i < total1; i+= 40) {
-           Serial.print("#");
-    }
-
-    /* add another for loop here to show other side */
     
     Serial.print("\n");
     
