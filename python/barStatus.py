@@ -6,7 +6,7 @@ class BarStatus:
 
     offset = 60                                # offset between each of the bars
     width = 40                      # of each bar
-    length = 750                    # max length of each bar
+    length = 1920 - 300                    # max length of each bar
     rectFill = ["#B71212", "#07106D", "#F26D00", "#0C4F06"]
     #rectFill = ["#293352", "purple", "green", "red", "blue", "grey", "pink"]
     rectFillAlt = rectFill #["#293352", "purple", "green", "red", "blue", "grey", "pink"]
