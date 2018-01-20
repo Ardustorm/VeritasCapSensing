@@ -38,7 +38,7 @@ CHANGE_TIMES = [20, 40]         # The times the questions change (min past the h
 DEBUG = False
 STATS = True
 MAX_BUTTON_NUM = 4
-BUTTON_NUM = 2
+# BUTTON_NUM = 2
 Qnum = 0
 
 
@@ -127,17 +127,17 @@ divGraph = DividedBarGraph( canvas, (150, 1050), questions[Qnum][1])
 barGraph = BarGraph( canvas, (1200, 350), questions[Qnum][1])
 
 def updateAll(string):
-    threshold = 40           # center point of when bar should move
+    threshold = 30           # center point of when bar should move
     deadZone = 10            # prevent jitter (like a schmitt trigger)
     statStep = 25/100        # How much the status changes each step
 
     
     lst = string.split()
     # TODO: make it also check all are numbers
-    if(len(lst) < BUTTON_NUM):          # stop processing if list incomplete
+    if(len(lst) < MAX_BUTTON_NUM):          # stop processing if list incomplete
         return
 
-    for i in range(BUTTON_NUM):
+    for i in range(MAX_BUTTON_NUM):
         if int(lst[i]) > threshold + deadZone:
             status[Qnum][i] += statStep
         elif int(lst[i]) < threshold - deadZone:

@@ -7,7 +7,7 @@ class BarGraph:
     colors = ["#293352", "purple", "green", "red", "blue", "grey", "pink"]
     colorsActive = []
 
-    length = 1000
+    length = 500
     width = 50
     fontSize = 35
     offset = 200                # offset between each of the bars
@@ -26,7 +26,7 @@ class BarGraph:
         for i in range(self.number):
             x0 = self.location[0]
             y0 = self.location[1] + i * self.offset
-            x1 = self.location[0]+ (i+1)*self.length/self.number
+            x1 = self.location[0]+ (i+1)*self.length
             y1 = self.location[1] + i * self.offset + self.width
 
             rect = self.canvas.create_rectangle( x0, y0, x1, y1, fill=self.colors[i])
@@ -44,11 +44,10 @@ class BarGraph:
 
 
     def update(self, votes, status, canVote):
-        total = sum(votes)
+        
         maxCount = max(votes)
         for i in range (self.number):
             x0, y0, x1, y1 = self.canvas.coords(self.rects[i])
-
             
             newEnd =  x0 + votes[i]/maxCount*self.length
             
