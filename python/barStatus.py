@@ -4,11 +4,9 @@ class BarStatus:
 
 
 
-    offset = 200                                # offset between each of the bars
-    width = 50                      # of each bar
+    offset = 60                                # offset between each of the bars
+    width = 40                      # of each bar
     length = 450                    # max length of each bar
-    left = 1200                     # where to start the bars (from the left)
-    top =400                        # Where to start the bars
 
     rectFill = "#A51C30"
     rectFillAlt = "#C3384B"

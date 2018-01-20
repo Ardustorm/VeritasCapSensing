@@ -3,6 +3,14 @@ from tkinter import *
 from fakeSerial import *
 from barStatus import *
 from dividedBarGraph import *
+from barGraph import *
+import datetime
+import logging
+
+logging.basicConfig(filename="stats.log",
+                    format='%(asctime)s, %(message)s',
+                    level=logging.INFO)
+
 # The start of this code came from here Evan Boldt:
 # http://robotic-controls.com/learn/python-guis/tkinter-serial
 
@@ -25,16 +33,23 @@ for port in serialPorts:
         print("Cannot connect to:", port)
 
 
-
+CHANGE_TIMES = [20, 40]         # The times the questions change (min past the hour)
 DEBUG = False
+STATS = True
 MAX_BUTTON_NUM = 4
 BUTTON_NUM = 2
-Qnum = 1
+Qnum = 0
 questions = [ ("Is Morality Objective or Subjective?", ["Subjective", "Other", "Objective"]),
               ("Do you like candy?", [ "Love it!", "Kind of", "sure?", "no"]),
-              ("Do you like long questions that seem to go on and on and don't really have an end or meaning?", [ "Love it!", "Kind of", "sure?", "I only like really long, meaningless answers"]),
+              ("Do you like long questions?", [ "Love it!", "Kind of", "sure?", "I only like some answers"]),
               ("Is there meaning in life?", ["yes", "no"])]
 
+
+logging.info("Starting up with the following Questions:\n\n")
+for q in questions:
+    logging.info( q[0] + ",\t"+ str(q[1]))
+
+logging.info("Question Number, Answer Number, Total for answer, [all answers for question]")
 #labelsText = [["Subjective", "Other", "Objective"]' "3", "4", "5"] # labels for each bar graph
 
 def toggleFullscreen(event):
@@ -48,10 +63,9 @@ def toggleDebug(event):
     else:
         log.pack_forget()
 
-def step(event):
+def step(event=None):
     global Qnum
     Qnum = (Qnum + 1) % len(questions)
-    print("NEXT question please!")
 
     # update text
     canvas.itemconfig(question, text = questions[Qnum][0])
@@ -59,6 +73,7 @@ def step(event):
     # update voting stuff
     barStatus.changeLabels(questions[Qnum][1])
     divGraph.changeLabels(questions[Qnum][1])
+    barGraph.changeLabels(questions[Qnum][1])
     pass
 
 #make a TkInter Window
@@ -110,9 +125,9 @@ question = canvas.create_text(
 
 
 
-barStatus = BarStatus(canvas, (left,top), questions[Qnum][1])
-divGraph = DividedBarGraph( canvas, (200, 900), questions[Qnum][1])
-
+barStatus = BarStatus(canvas, (450, 800), questions[Qnum][1])
+divGraph = DividedBarGraph( canvas, (150, 1050), questions[Qnum][1])
+barGraph = BarGraph( canvas, (1200, 350), questions[Qnum][1])
 
 def updateAll(string):
     threshold = 40           # center point of when bar should move
@@ -132,14 +147,20 @@ def updateAll(string):
             status[Qnum][i] += - statStep
         status[Qnum][i] = max( min(1, status[Qnum][i]), 0)
 
+        # A vote was just cast
         if status[Qnum][i] == 1 and canVote[Qnum][i]:
+            if STATS:
+                logging.info("{}, {},   {}, {}".format(Qnum,  i, votes[Qnum][i], votes[Qnum]))
+
             votes[Qnum][i]+=1
             canVote[Qnum][i] = False
-            # A vote was just cast
+            
+        # A button was just reset            
         elif status[Qnum][i] == 0:
             canVote[Qnum][i] = True
-            # A button was just reset
-    divGraph.update(votes[Qnum], status[Qnum], canVote[Qnum])
+
+    divGraph.update(  votes[Qnum], status[Qnum], canVote[Qnum])
+    barGraph.update(  votes[Qnum], status[Qnum], canVote[Qnum])
     barStatus.update( votes[Qnum], status[Qnum], canVote[Qnum])
 
 
@@ -162,7 +183,8 @@ def readSerial():
             serBuffer += "\n" # add the newline to the buffer
 
             #add the line to the TOP of the log
-            log.insert('0.0', serBuffer)
+            if DEBUG:
+                log.insert('0.0', serBuffer)
             #update(serBuffer)
             updateAll(serBuffer)
             serBuffer = "" # empty the buffer
@@ -172,7 +194,15 @@ def readSerial():
     root.after(2, readSerial) # check serial again soon
 
 
+def rotateQuestions():
+    now = datetime.datetime.now()
+    if now.minute in CHANGE_TIMES:
+        step()
+
+    # Check every N seconds
+    root.after(1000*5, rotateQuestions )
+    
 # after initializing serial, an arduino may need a bit of time to reset
 root.after(200, readSerial)
-
+root.after(200, rotateQuestions )
 root.mainloop()
