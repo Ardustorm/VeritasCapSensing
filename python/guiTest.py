@@ -69,8 +69,8 @@ def step(event=None):
     
     # update voting stuff
     barStatus.changeLabels(questions[Qnum][1])
-    divGraph.changeLabels(questions[Qnum][1])
-    barGraph.changeLabels(questions[Qnum][1])
+    divGraph.changeLabels([ "" for i in range(len(questions[Qnum][1]))]) # chr(ord("A") +i)
+    #barGraph.changeLabels(questions[Qnum][1])
     pass
 
 #make a TkInter Window
@@ -108,23 +108,20 @@ offset = 200                                # offset between each of the bars
 width = 50                      # of each bar
 left = 1200                     # where to start the bars (from the left)
 length = 450                    # max length of each bar
-top =400                        # Where to start the bars
+top =300                        # Where to start the bars
 
 
 
-
+margin = 150
 
 question = canvas.create_text(
-    left/2, top +width/2 + offset, width = left, justify=CENTER,
-    font=("Purisa-Bold", 70), anchor =CENTER, fill="#1E1E1E",
+    1920/2, top , width = 1920- 2*margin, justify=CENTER,
+    font=("Purisa-Bold", 70), anchor =N, fill="#1E1E1E",
     text = questions[Qnum][0])
 
-
-
-
-barStatus = BarStatus(canvas, (450, 800), questions[Qnum][1])
-divGraph = DividedBarGraph( canvas, (150, 1050), questions[Qnum][1])
-barGraph = BarGraph( canvas, (1200, 350), questions[Qnum][1])
+barStatus = BarStatus(canvas, (margin, 600), questions[Qnum][1])
+divGraph = DividedBarGraph( canvas, (margin, 950),["" for i in range(len(questions[Qnum][1]))] ) # chr(ord("A") +i)
+# barGraph = BarGraph( canvas, (1200, 350), questions[Qnum][1])
 
 def updateAll(string):
     threshold = 30           # center point of when bar should move
@@ -157,7 +154,7 @@ def updateAll(string):
             canVote[Qnum][i] = True
 
     divGraph.update(  votes[Qnum], status[Qnum], canVote[Qnum])
-    barGraph.update(  votes[Qnum], status[Qnum], canVote[Qnum])
+    #barGraph.update(  votes[Qnum], status[Qnum], canVote[Qnum])
     barStatus.update( votes[Qnum], status[Qnum], canVote[Qnum])
 
 

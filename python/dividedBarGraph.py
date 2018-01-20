@@ -4,10 +4,11 @@ class DividedBarGraph:
     #rects = []
     #numbers = []
     #labels = []
-    colors = ["#293352", "purple", "green", "red", "blue", "grey", "pink"]
+    colors = ["#B71212", "#07106D", "#F26D00", "#0C4F06"]
+    #colors = ["#293352", "purple", "green", "red", "blue", "grey", "pink"]
     colorsActive = []
 
-    length = 1000
+    length = 1920 - 2 *150
     width = 50
     fontSize = 35
 
@@ -34,8 +35,8 @@ class DividedBarGraph:
                 x0, self.location[1],
                 font=("Purisa-Bold", self.fontSize), anchor =SW, fill="#1E1E1E",
                 text = labelsText[i])
-            label = self.canvas.create_text(x0, self.location[1]+self.width,
-                font=("Purisa-Bold", self.fontSize), anchor =NW, fill="#1E1E1E",
+            label = self.canvas.create_text(x0+10, self.location[1],
+                font=("Purisa-Bold", self.fontSize), anchor =SW, fill="#1E1E1E",
                 text = labelsText[i])
     
             self.rects.append(rect)
