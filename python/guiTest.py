@@ -27,8 +27,15 @@ for port in serialPorts:
 
 
 DEBUG = False
+MAX_BUTTON_NUM = 4
 BUTTON_NUM = 2
-labelsText = ["Subjective", "Other", "Objective", "3", "4", "5"] # labels for each bar graph
+Qnum = 1
+questions = [ ("Is Morality Objective or Subjective?", ["Subjective", "Other", "Objective"]),
+              ("Do you like candy?", [ "Love it!", "Kind of", "sure?", "no"]),
+              ("Do you like long questions that seem to go on and on and don't really have an end or meaning?", [ "Love it!", "Kind of", "sure?", "I only like really long, meaningless answers"]),
+              ("Is there meaning in life?", ["yes", "no"])]
+
+#labelsText = [["Subjective", "Other", "Objective"]' "3", "4", "5"] # labels for each bar graph
 
 def toggleFullscreen(event):
     root.attributes("-fullscreen", root.attributes("-fullscreen") == 0)
@@ -41,6 +48,19 @@ def toggleDebug(event):
     else:
         log.pack_forget()
 
+def step(event):
+    global Qnum
+    Qnum = (Qnum + 1) % len(questions)
+    print("NEXT question please!")
+
+    # update text
+    canvas.itemconfig(question, text = questions[Qnum][0])
+    
+    # update voting stuff
+    barStatus.changeLabels(questions[Qnum][1])
+    divGraph.changeLabels(questions[Qnum][1])
+    pass
+
 #make a TkInter Window
 root = Tk()
 root.wm_title("Veritas Voting")
@@ -48,6 +68,7 @@ root.attributes("-fullscreen", True)
 root.bind("<Control-w>", lambda e: root.destroy())
 root.bind("<Escape>", toggleFullscreen)
 root.bind("h", toggleDebug)
+root.bind("b", step)
 canvas = Canvas(root, width=1000, height=800, bg="#F3F3F1")
 canvas.pack(fill=BOTH, expand=YES)
 logo = PhotoImage(file='logo.png')
@@ -60,9 +81,16 @@ if not DEBUG:
     log.pack_forget()
 
 
-votes = [1 for i in range(BUTTON_NUM)]            # an array to store votes for each
-canVote = [True for i in range(BUTTON_NUM)] # keeps track if slider has reset yet
-status = [0.0 for i in range(BUTTON_NUM)] # what stage is the button in (ie starting to vote, cooling down, at max/min)
+# an array of arrays to store votes for each question/answer
+votes =  [ [1 for i in range(len(x[1]))] for x in questions]
+# votes = [1 for i in range(BUTTON_NUM)]
+
+canVote =  [ [True for i in range(len(x[1]))] for x in questions] # keeps track if slider has reset yet
+#canVote = [True for i in range(BUTTON_NUM)] # keeps track if slider has reset yet
+
+# what stage is the button in (ie starting to vote, cooling down, at max/min)
+status =  [ [0.0 for i in range(len(x[1]))] for x in questions]
+#status = [0.0 for i in range(BUTTON_NUM)] # what stage is the button in (ie starting to vote, cooling down, at max/min)
 
 offset = 200                                # offset between each of the bars
 width = 50                      # of each bar
@@ -77,12 +105,13 @@ top =400                        # Where to start the bars
 question = canvas.create_text(
     left/2, top +width/2 + offset, width = left, justify=CENTER,
     font=("Purisa-Bold", 70), anchor =CENTER, fill="#1E1E1E",
-    text = "Is Morality Objective or Subjective?")
+    text = questions[Qnum][0])
 
 
 
-barStatus = BarStatus(canvas, (left,top), BUTTON_NUM, labelsText)
-divGraph = DividedBarGraph( canvas, (200, 900), BUTTON_NUM, labelsText)
+
+barStatus = BarStatus(canvas, (left,top), questions[Qnum][1])
+divGraph = DividedBarGraph( canvas, (200, 900), questions[Qnum][1])
 
 
 def updateAll(string):
@@ -98,20 +127,20 @@ def updateAll(string):
 
     for i in range(BUTTON_NUM):
         if int(lst[i]) > threshold + deadZone:
-            status[i] += statStep
+            status[Qnum][i] += statStep
         elif int(lst[i]) < threshold - deadZone:
-            status[i] += - statStep
-        status[i] = max( min(1, status[i]), 0)
+            status[Qnum][i] += - statStep
+        status[Qnum][i] = max( min(1, status[Qnum][i]), 0)
 
-        if status[i] == 1 and canVote[i]:
-            votes[i]+=1
-            canVote[i] = False
+        if status[Qnum][i] == 1 and canVote[Qnum][i]:
+            votes[Qnum][i]+=1
+            canVote[Qnum][i] = False
             # A vote was just cast
-        elif status[i] == 0:
-            canVote[i] = True
+        elif status[Qnum][i] == 0:
+            canVote[Qnum][i] = True
             # A button was just reset
-    divGraph.update(votes, status, canVote)
-    barStatus.update( votes, status, canVote)
+    divGraph.update(votes[Qnum], status[Qnum], canVote[Qnum])
+    barStatus.update( votes[Qnum], status[Qnum], canVote[Qnum])
 
 
     

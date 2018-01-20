@@ -2,9 +2,6 @@ from tkinter import *
 
 class BarStatus:
 
-    rects = []                      # The bars in the bar graph
-    labels = []                     # Currently used to display votes
-    options = []
 
 
     offset = 200                                # offset between each of the bars
@@ -16,24 +13,33 @@ class BarStatus:
     rectFill = "#A51C30"
     rectFillAlt = "#C3384B"
 
-    def __init__(self, canvas, loc, num, labelsText=[]):
-        self.labelsText = labelsText
-        self.number = num
+    def __init__(self, canvas, loc, labelsText=[]):
+        self.rects = []                      # The bars in the bar graph
+        self.labels = []                     # Currently used to display votes
+        self.options = []
+        
         self.canvas = canvas
         self.location = loc
+
+        self.makeBars(labelsText)
+
+    # This was part of the init but I moved to seperate function to be able to change them
+    def makeBars(self, labelsText):
+        self.number = len(labelsText)
+        
         for i in range(self.number):
-            rect = canvas.create_rectangle(
+            rect = self.canvas.create_rectangle(
                 self.location[0], self.location[1] + self.offset*i,
                 self.location[0]+self.length, self.location[1] + self.width + self.offset*i,
                 fill=self.rectFill)
             
-            text = canvas.create_text(
+            text = self.canvas.create_text(
                 self.location[0]+self.length + self.width/2, self.location[1] +self.width/2 + self.offset*i,
                 font=("Purisa-Bold", 35), anchor =W, fill="#1E1E1E")
-            option = canvas.create_text(
+            option = self.canvas.create_text(
                 self.location[0] + self.width, self.location[1] +self.width/2 + self.offset*i,
                 font=("Purisa-Bold", 35), anchor =W, fill="#1E1E1E",
-                text = self.labelsText[i])
+                text = labelsText[i])
             
             self.rects.append(rect)
             self.labels.append(text)
@@ -57,3 +63,17 @@ class BarStatus:
                 self.canvas.itemconfig(self.rects[i], fill=self.rectFill)
             else:
                 self.canvas.itemconfig(self.rects[i], fill=self.rectFillAlt)
+
+
+    def changeLabels(self, labelsText):
+        for i in range(self.number):
+            self.canvas.delete(self.rects[i])
+            #Deleting the text doesn't work for some reason? TODO:
+            self.canvas.delete(self.labels[i])
+            self.canvas.delete(self.options[i])
+        self.rects.clear()
+        self.labels.clear()
+        self.options.clear()
+
+            
+        self.makeBars(labelsText)
