@@ -84,6 +84,7 @@ root.bind("b", step)
 canvas = Canvas(root, width=1000, height=800, bg="#F3F3F1")
 canvas.pack(fill=BOTH, expand=YES)
 logo = PhotoImage(file='logo.png')
+logo = logo.subsample(2,2)      # TODO just change the original image
 canvas.create_image(1000, 150, image=logo)
 
 # make a text box to put the serial output
@@ -108,7 +109,7 @@ offset = 200                                # offset between each of the bars
 width = 50                      # of each bar
 left = 1200                     # where to start the bars (from the left)
 length = 450                    # max length of each bar
-top =300                        # Where to start the bars
+top =400                        # Where to start the bars
 
 
 
@@ -116,7 +117,7 @@ margin = 150
 
 question = canvas.create_text(
     1920/2, top , width = 1920- 2*margin, justify=CENTER,
-    font=("Purisa-Bold", 70), anchor =N, fill="#1E1E1E",
+    font=("Purisa-Bold", 100), anchor =CENTER, fill="#1E1E1E",
     text = questions[Qnum][0])
 
 barStatus = BarStatus(canvas, (margin, 600), questions[Qnum][1])
@@ -126,7 +127,7 @@ divGraph = DividedBarGraph( canvas, (margin, 950),["" for i in range(len(questio
 def updateAll(string):
     threshold = 30           # center point of when bar should move
     deadZone = 10            # prevent jitter (like a schmitt trigger)
-    statStep = 25/100        # How much the status changes each step
+    statStep = 5/100        # How much the status changes each step
 
     
     lst = string.split()
