@@ -68,7 +68,6 @@ class BarStatus:
     def changeLabels(self, labelsText):
         for i in range(self.number):
             self.canvas.delete(self.rects[i])
-            #Deleting the text doesn't work for some reason? TODO:
             self.canvas.delete(self.labels[i])
             self.canvas.delete(self.options[i])
         self.rects.clear()
