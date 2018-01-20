@@ -4,6 +4,7 @@ from fakeSerial import *
 from barStatus import *
 from dividedBarGraph import *
 from barGraph import *
+from questionSet1 import *
 import datetime
 import logging
 
@@ -39,10 +40,6 @@ STATS = True
 MAX_BUTTON_NUM = 4
 BUTTON_NUM = 2
 Qnum = 0
-questions = [ ("Is Morality Objective or Subjective?", ["Subjective", "Other", "Objective"]),
-              ("Do you like candy?", [ "Love it!", "Kind of", "sure?", "no"]),
-              ("Do you like long questions?", [ "Love it!", "Kind of", "sure?", "I only like some answers"]),
-              ("Is there meaning in life?", ["yes", "no"])]
 
 
 logging.info("Starting up with the following Questions:\n\n")
@@ -200,7 +197,7 @@ def rotateQuestions():
         step()
 
     # Check every N seconds
-    root.after(1000*5, rotateQuestions )
+    root.after(1000*60 -10, rotateQuestions )
     
 # after initializing serial, an arduino may need a bit of time to reset
 root.after(200, readSerial)
