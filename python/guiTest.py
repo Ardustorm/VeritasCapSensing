@@ -137,7 +137,7 @@ def updateAll(string):
     if(len(lst) < MAX_BUTTON_NUM):          # stop processing if list incomplete
         return
 
-    for i in range(MAX_BUTTON_NUM):
+    for i in range(len(status[Qnum])):
         if int(lst[i]) > threshold + deadZone:
             status[Qnum][i] += statStep
         elif int(lst[i]) < threshold - deadZone:
