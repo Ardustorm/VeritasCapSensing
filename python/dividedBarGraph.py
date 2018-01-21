@@ -4,7 +4,7 @@ class DividedBarGraph:
     #rects = []
     #numbers = []
     #labels = []
-    colors = ["#B71212", "#07106D", "#F26D00", "#0C4F06"]
+    colors = ["#B71212", "#000EAA", "#F26D00", "#087708"]
     #colors = ["#293352", "purple", "green", "red", "blue", "grey", "pink"]
     colorsActive = []
 

@@ -34,7 +34,7 @@ for port in serialPorts:
         print("Cannot connect to:", port)
 
 
-CHANGE_TIMES = [20, 40]         # The times the questions change (min past the hour)
+CHANGE_TIMES = [15, 35, 55]         # The times the questions change (min past the hour)
 DEBUG = False
 STATS = True
 MAX_BUTTON_NUM = 4
@@ -73,6 +73,11 @@ def step(event=None):
     #barGraph.changeLabels(questions[Qnum][1])
     pass
 
+def logResults(event=None):
+    # print the question number and the votes cast
+    for i in range(len(questions)):
+        logging.info(i, votes[i])
+
 #make a TkInter Window
 root = Tk()
 root.wm_title("Veritas Voting")
@@ -81,6 +86,7 @@ root.bind("<Control-w>", lambda e: root.destroy())
 root.bind("<Escape>", toggleFullscreen)
 root.bind("h", toggleDebug)
 root.bind("b", step)
+root.bind("w", logResults)
 canvas = Canvas(root, width=1000, height=800, bg="#F3F3F1")
 canvas.pack(fill=BOTH, expand=YES)
 logo = PhotoImage(file='logo.png')
