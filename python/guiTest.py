@@ -15,7 +15,7 @@ logging.basicConfig(filename="stats.log",
 # The start of this code came from here Evan Boldt:
 # http://robotic-controls.com/learn/python-guis/tkinter-serial
 
-
+STEP_AFTER_ANSWER = 10000          # in mS (negative to disable)
 serialPorts = ["/dev/ttyUSB0", "/dev/ttyUSB1","/dev/ttyUSB2", "FAKE"]
 baudRate = 115200
 
@@ -150,6 +150,8 @@ def updateAll(string):
 
         # A vote was just cast
         if status[Qnum][i] == 1 and canVote[Qnum][i]:
+            if STEP_AFTER_ANSWER > 0:
+                root.after(STEP_AFTER_ANSWER, step)
             if STATS:
                 logging.info("{}, {},   {}, {}".format(Qnum,  i, votes[Qnum][i], votes[Qnum]))
 
